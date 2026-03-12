@@ -181,7 +181,7 @@ export default function () {
           <div className="relative shadow-2xl shadow-primary/40 rounded-2xl overflow-hidden shrink-0">
             <img
               className="max-w-md w-full object-cover rounded-2xl"
-              src="/images/finestbanner.jpeg"
+              src="/images/FinestBanner.jpeg"
               alt=""
             />
           </div>
