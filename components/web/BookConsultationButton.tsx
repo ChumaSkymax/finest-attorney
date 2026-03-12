@@ -9,7 +9,7 @@ export default function BookConsultationButton() {
       onClick={openModal}
       className="bg-primary hover:bg-primary/80 transition rounded-full px-4 py-2 text-white cursor-pointer text-sm"
     >
-      Book a Consultation
+      Book Consultation
     </button>
   );
 }

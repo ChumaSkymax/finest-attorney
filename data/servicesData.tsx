@@ -9,7 +9,7 @@ const getServiceData = (): z.infer<typeof serviceSchema>[] => {
       slug: "corporate-commercial-law",
       description:
         "We provide comprehensive legal support to businesses at every stage of their lifecycle, from incorporation to expansion and restructuring. Our services include company formation, drafting shareholder agreements, corporate governance advisory, and preparation of commercial contracts. We also assist with mergers, acquisitions, joint ventures, and regulatory compliance, ensuring that business operations align with applicable laws while protecting the interests of stakeholders.",
-      image: "/images/corporate.png",
+      image: "/images/Corporate.png",
     },
     {
       _id: "s2",
@@ -17,7 +17,7 @@ const getServiceData = (): z.infer<typeof serviceSchema>[] => {
       slug: "banking-finance",
       description:
         "Our banking and finance practice advises financial institutions, lenders, investors, and corporate borrowers on a wide range of financial transactions. We assist in structuring loan facilities, drafting securities documentation, guarantees, and other financial instruments. The firm also provides guidance on regulatory compliance, risk management, and enforcement of security interests in the event of default, ensuring that transactions are legally sound and commercially viable.",
-      image: "/images/banking.png",
+      image: "/images/Banking.png",
     },
     {
       _id: "s3",
@@ -33,7 +33,7 @@ const getServiceData = (): z.infer<typeof serviceSchema>[] => {
       slug: "labour-employment-law",
       description:
         "We assist employers and organizations in managing employment relationships in compliance with labour laws and workplace regulations. Our services include drafting employment contracts, developing workplace policies, advising on disciplinary procedures, termination processes, and retrenchment matters. We also represent clients in labour disputes before tribunals and courts, helping resolve conflicts while protecting organizational interests and employee rights.",
-      image: "/images/labour.png",
+      image: "/images/Labour.png",
     },
     {
       _id: "s5",
@@ -41,7 +41,7 @@ const getServiceData = (): z.infer<typeof serviceSchema>[] => {
       slug: "real-estate-conveyancing",
       description:
         "Our real estate and conveyancing services cover the legal aspects of property acquisition, transfer, leasing, and development. We conduct thorough due diligence to verify ownership, identify encumbrances, and ensure compliance with land regulations. The firm prepares conveyancing documents, facilitates registration of titles, and advises clients on secure property transactions, helping prevent disputes and protect long-term investments.",
-      image: "/images/RealEstate.png",
+      image: "/images/Realestate.png",
     },
     {
       _id: "s6",

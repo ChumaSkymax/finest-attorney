@@ -17,7 +17,7 @@ export default function Hero() {
     "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop",
   ];
 
-  const mainImageUrl = "/images/finestbanner.jpeg";
+  const mainImageUrl = "/images/FinestBanner.jpeg";
 
   const galleryStripImages = [
     "/images/finest-banner.jpg",
