@@ -53,21 +53,21 @@ const items = [
     icon: Home,
   },
   {
-    title: "Services",
+    title: "Manage Services",
     url: "/dashboard/services",
     icon: ServerIcon,
   },
   {
-    title: "Team",
-    url: "/dashboard/team",
+    title: "Manage Team",
+    url: "/dashboard/manageTeam",
     icon: User,
   },
   {
-    title: "Bookings",
+    title: "Manage Bookings",
     url: "/dashboard/bookings",
     icon: Calendar,
   },
-  { title: "Articles", url: "/dashboard/newsarticles", icon: Book },
+  { title: "Legal Updates", url: "/dashboard/legalupdates", icon: Book },
 ];
 
 export default function AppSidebar() {
@@ -88,7 +88,6 @@ export default function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
