@@ -10,5 +10,5 @@ export const legalUpdatesSchema = z.object({
     .string()
     .min(3, "Published At must be at least 3 characters long"),
   readTime: z.string().min(3, "Read Time must be at least 3 characters long"),
-  featuredImage: z.instanceof(File, { message: "Featured Image is required" }),
+  featuredImage: z.union([z.instanceof(File), z.string()]),
 });

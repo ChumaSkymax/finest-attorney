@@ -17,7 +17,7 @@ const heroCards: HeroCardItem[] = [
     title: "Our Lawyers",
     description:
       "Experienced legal professionals dedicated to protecting your rights and interests.",
-    href: "/about-us",
+    href: "/our-team",
   },
   {
     id: 2,
