@@ -9,15 +9,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Briefcase, User } from "lucide-react";
 
-interface StaffDetails {
-  _id: string;
-  name: string;
-  role: string;
-  image: string;
-}
+import { TeamColumnType } from "@/app/(dashboard)/dashboard/manageTeam/columns";
 
 interface Props {
-  member: StaffDetails;
+  member: TeamColumnType;
 }
 
 export default function ViewStaff({ member }: Props) {
@@ -34,7 +29,7 @@ export default function ViewStaff({ member }: Props) {
         {/* Profile Photo */}
         <div className="flex justify-center">
           <img
-            src={member.image}
+            src={member.image || ""}
             alt={member.name}
             className="w-28 h-28 rounded-full object-cover border-2 border-muted"
           />
@@ -56,7 +51,7 @@ export default function ViewStaff({ member }: Props) {
             <Briefcase className="h-4 w-4 text-muted-foreground shrink-0" />
             <div>
               <p className="text-xs text-muted-foreground">Role / Position</p>
-              <p className="text-sm font-medium">{member.role}</p>
+              <p className="text-sm font-medium">{member.position}</p>
             </div>
           </div>
         </div>

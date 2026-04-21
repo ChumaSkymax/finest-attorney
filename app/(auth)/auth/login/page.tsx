@@ -21,13 +21,23 @@ import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { useForm, Controller } from "@/lib/react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CircleIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  CircleIcon,
+  EyeIcon,
+  EyeOffIcon,
+  Loader2Icon,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
+import Image from "next/image";
 
 export default function LoginPage() {
+  const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -39,6 +49,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     try {
+      setSubmitting(true);
       await authClient.signIn.email({
         email: data.email,
         password: data.password,
@@ -48,22 +59,39 @@ export default function LoginPage() {
             router.push("/");
           },
           onError: () => {
-            toast.error("Login Failed");
+            setSubmitting(false);
+            toast.error("Invalid Email or Password");
           },
         },
       });
     } catch (error) {
       console.log(error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center max-w-6xl mx-auto h-screen">
-      <div className="flex flex-col items-center gap-1 mb-4">
-        <CircleIcon className="h-10 w-10 text-primary" />
-        <p className="text-xl font-bold">Finest Logo</p>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 relative">
+      <div className="absolute top-4 left-4 md:top-8 md:left-8">
+        <Link
+          href="/"
+          className="group flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+        >
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          <span>Back to Home</span>
+        </Link>
       </div>
-      <Card className="w-full max-w-sm mx-auto">
+      <div className="flex flex-col items-center gap-1 mb-4">
+        <Image
+          src="/images/logo.svg"
+          alt="Logo"
+          width={200}
+          height={200}
+          className="rounded-full"
+        />
+      </div>
+      <Card className="w-full max-w-sm mx-auto px-4">
         <CardHeader className="text-center">
           <CardTitle className="text-xl font-bold">
             Login to your account
@@ -114,14 +142,28 @@ export default function LoginPage() {
                       </Link>
                     </FieldContent>
 
-                    <Input
-                      {...field}
-                      id="login-password"
-                      type="password"
-                      placeholder="Enter your password"
-                      autoComplete="current-password"
-                      aria-invalid={fieldState.invalid}
-                    />
+                    <div className="relative">
+                      <Input
+                        {...field}
+                        id="login-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        autoComplete="current-password"
+                        aria-invalid={fieldState.invalid}
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-0 h-full flex items-center text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showPassword ? (
+                          <EyeOffIcon className="h-4 w-4" />
+                        ) : (
+                          <EyeIcon className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
@@ -132,9 +174,17 @@ export default function LoginPage() {
 
             <button
               type="submit"
+              disabled={submitting}
               className="mt-4 w-full rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              Log in
+              {submitting ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">Logging in...</span>
+                </div>
+              ) : (
+                "Log in"
+              )}
             </button>
           </form>
         </CardContent>

@@ -1,23 +1,68 @@
+"use client";
+
 import Title from "@/components/web/Title";
-import getServicesData from "@/data/servicesData";
+import { Skeleton } from "@/components/ui/skeleton";
+import getPreviewText from "@/components/web/getPreviewText";
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import getPreviewText from "@/components/web/getPreviewText";
-import { motion } from "framer-motion";
+
+export interface ServiceData {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+  image?: string | null;
+  createdBy?: string;
+  createdAt?: number;
+  updatedAt?: number;
+}
+
+function ServiceCardSkeleton() {
+  return (
+    <div className="rounded-xl overflow-hidden border flex flex-col">
+      <Skeleton className="w-full h-[250px] rounded-none" />
+      <div className="p-6 flex flex-col justify-between h-[210px]">
+        <div>
+          <Skeleton className="h-5 w-3/4 mb-3" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6 mt-1" />
+          <Skeleton className="h-4 w-2/3 mt-1" />
+        </div>
+        <Skeleton className="h-4 w-24 mt-5" />
+      </div>
+    </div>
+  );
+}
 
 export default function PractiseAreas() {
-  const data = getServicesData();
+  const services = useQuery(api.services.getServices);
+
+  if (!services) {
+    return (
+      <div className="relative mt-8 mb-8">
+        <div className="flex flex-col max-w-6xl mx-auto px-4">
+          {/* <Title
+            title="Practice Areas"
+            description="Professional legal services designed to help businesses and individuals navigate complex legal matters."
+            align="center"
+          /> */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <ServiceCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative mt-28 mb-8">
+    <div className="relative mt-8 mb-8">
       <div className="flex flex-col max-w-6xl mx-auto px-4">
-        <Title
-          title="Practice Areas"
-          description="Professional legal services designed to help businesses
-and individuals navigate complex legal matters."
-          align="center"
-        />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {data.map((service) => (
+          {services.map((service: ServiceData) => (
             <div
               key={service._id}
               className="group rounded-xl overflow-hidden border
@@ -26,7 +71,7 @@ and individuals navigate complex legal matters."
               <Link href={`/practise-areas/${service._id}`}>
                 <div className="relative overflow-hidden">
                   <img
-                    src={service.image}
+                    src={service.image || ""}
                     alt={service.title}
                     className="w-full h-[250px] object-cover transition-transform duration-500 group-hover:scale-105"
                   />

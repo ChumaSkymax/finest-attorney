@@ -1,7 +1,9 @@
 "use client";
 
 import { legalUpdatesSchema } from "@/app/schema/legalUpdatesSchema";
-import EditArticle from "@/components/Dashboard/LegalUpdatesComponents/EditArticle";
+import EditArticle, {
+  ArticleData,
+} from "@/components/Dashboard/LegalUpdatesComponents/EditArticle";
 import { Button } from "@/components/ui/button";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -14,19 +16,29 @@ import z from "zod";
 
 export const getColumns = (
   handleDelete: (id: string) => void,
-): ColumnDef<z.infer<typeof legalUpdatesSchema>>[] => [
+): ColumnDef<ArticleData>[] => [
   {
     accessorKey: "featuredImage",
-    header: "Image",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Image
+      </span>
+    ),
     cell: ({ row }) => {
       const imageUrl = row.getValue("featuredImage") as string;
       return (
         <div>
-          <img
-            src={imageUrl}
-            alt="article.title"
-            className="w-12 h-12 object-cover rounded-md"
-          />
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt="article"
+              className="w-12 h-12 object-cover rounded-md"
+            />
+          ) : (
+            <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center text-xs text-muted-foreground">
+              None
+            </div>
+          )}
         </div>
       );
     },
@@ -36,8 +48,8 @@ export const getColumns = (
     header: ({ column }) => {
       return (
         <Button
-          className="cursor-pointer"
           variant="ghost"
+          className="-ml-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Title
@@ -45,10 +57,17 @@ export const getColumns = (
         </Button>
       );
     },
+    cell: ({ row }) => (
+      <span className="text-sm font-medium">{row.getValue("title")}</span>
+    ),
   },
   {
     accessorKey: "description",
-    header: "Description",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Description
+      </span>
+    ),
     cell: ({ row }) => {
       const getPreviewText = (text: string, maxChars = 30) => {
         if (!text) return "No description";
@@ -57,17 +76,22 @@ export const getColumns = (
       };
       const description = row.getValue("description");
       return (
-        <div>
-          <p className="line-clamp-2 text-sm text-gray-500">
-            {getPreviewText(description as string)}
-          </p>
-        </div>
+        <span className="text-xs text-muted-foreground block max-w-[200px]">
+          {getPreviewText(description as string, 50)}
+        </span>
       );
     },
   },
   {
     accessorKey: "author",
-    header: "Author",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Author
+      </span>
+    ),
+    cell: ({ row }) => (
+      <span className="text-sm font-medium">{row.getValue("author") || "Admin"}</span>
+    ),
   },
   {
     accessorKey: "Actions",
@@ -85,15 +109,13 @@ export const getColumns = (
                 </Button>
               </SheetTrigger>
 
-              <SheetContent>
-                <EditArticle article={article} />
-              </SheetContent>
+              <EditArticle article={article} />
             </Sheet>
 
             {/* Delete Button */}
             <Button
               size="sm"
-              variant="destructive"
+              variant="outline"
               onClick={() => handleDelete(article._id)}
             >
               <Trash className="h-4 w-4" />

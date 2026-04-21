@@ -20,69 +20,224 @@ export type BookingsData = {
   name: string;
   email: string;
   phone: string;
-  service: string;
+  serviceBooked: string;
   preferredDate: string;
   preferredTime: string;
   message: string;
-  status: string;
-  createdAt: string;
+  createdBy: string;
+  status: "pending" | "confirmed" | "cancelled";
+  createdAt: number;
+  updatedAt: number;
 };
 
-const handleStatusUpdate = async (bookingId: string, newStatus: string) => {
-  try {
-    // TODO: Replace with your actual API call, e.g.:
-    // await fetch(`/api/bookings/${bookingId}`, {
-    //   method: "PATCH",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ status: newStatus }),
-    // });
+const ActionsCell = ({
+  booking,
+  handleDelete,
+  handleStatusUpdate,
+}: {
+  booking: BookingsData;
+  handleDelete: (id: string) => void;
+  handleStatusUpdate: (
+    id: string,
+    status: "pending" | "confirmed" | "cancelled",
+  ) => void;
+}) => {
+  return (
+    <div className="flex items-center gap-2">
+      {/* View Booking - Eye Icon */}
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button size="icon" variant="ghost" className="h-8 w-8">
+            <Eye className="h-4 w-4" />
+            <span className="sr-only">View Booking</span>
+          </Button>
+        </SheetTrigger>
+        <ViewBooking booking={booking} />
+      </Sheet>
 
-    console.log(`Updating booking ${bookingId} status to: ${newStatus}`);
-    alert(`Booking status updated to: ${newStatus}`);
-  } catch (error) {
-    console.error("Failed to update booking status:", error);
-    alert("Failed to update booking status.");
-  }
+      {/* Update Status Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="icon" variant="ghost" className="h-8 w-8">
+            <MoreHorizontal className="h-4 w-4" />
+            <span className="sr-only">Update Status</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel className="text-xs">
+            Change Status
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => handleStatusUpdate(booking._id, "pending")}
+            disabled={booking.status === "pending"}
+          >
+            Pending
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleStatusUpdate(booking._id, "confirmed")}
+            disabled={booking.status === "confirmed"}
+          >
+            Confirmed
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleStatusUpdate(booking._id, "cancelled")}
+            disabled={booking.status === "cancelled"}
+          >
+            Cancelled
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Delete Button */}
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => handleDelete(booking._id)}
+      >
+        <Trash className="h-4 w-4" />
+      </Button>
+    </div>
+  );
 };
 
 export const getColumns = (
   handleDelete: (id: string) => void,
+  handleStatusUpdate: (
+    id: string,
+    status: "pending" | "confirmed" | "cancelled",
+  ) => void,
 ): ColumnDef<BookingsData>[] => [
   {
-    accessorKey: "service",
-    header: "Service Booked",
+    accessorKey: "serviceBooked",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Service
+      </span>
+    ),
+    cell: ({ row }) => (
+      <span className="text-sm font-medium max-w-[160px] truncate block">
+        {row.getValue("serviceBooked")}
+      </span>
+    ),
   },
   {
     accessorKey: "name",
-    header: "Name",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Name
+      </span>
+    ),
+    cell: ({ row }) => (
+      <span className="text-sm font-medium">{row.getValue("name")}</span>
+    ),
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Email
+      </span>
+    ),
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground">
+        {row.getValue("email")}
+      </span>
+    ),
   },
   {
     accessorKey: "phone",
-    header: "Phone",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Phone
+      </span>
+    ),
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground tabular-nums">
+        {row.getValue("phone")}
+      </span>
+    ),
   },
   {
     accessorKey: "preferredDate",
-    header: "Preferred Date",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Date
+      </span>
+    ),
+    cell: ({ row }) => (
+      <span className="text-xs tabular-nums">
+        {row.getValue("preferredDate")}
+      </span>
+    ),
   },
   {
     accessorKey: "preferredTime",
-    header: "Preferred Time",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Time
+      </span>
+    ),
+    cell: ({ row }) => (
+      <span className="text-xs tabular-nums">
+        {row.getValue("preferredTime")}
+      </span>
+    ),
   },
   {
     accessorKey: "message",
-    header: "Message",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Message
+      </span>
+    ),
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground max-w-[150px] truncate block">
+        {row.getValue("message")}
+      </span>
+    ),
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Status
+      </span>
+    ),
+    cell: ({ row }) => {
+      const status = row.getValue<string>("status");
+      const styles: Record<string, string> = {
+        pending:
+          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+        confirmed:
+          "bg-primary text-primary-foreground dark:bg-primary/30 dark:text-primary-foreground",
+        cancelled:
+          "bg-destructive text-destructive-foreground dark:bg-red-900/40 dark:text-red-100",
+      };
+      return (
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${styles[status] || ""}`}
+        >
+          {status.charAt(0).toUpperCase() + status.slice(1)}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "createdAt",
-    header: "Created At",
+    header: () => (
+      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Created
+      </span>
+    ),
+    cell: ({ row }) => {
+      const date = new Date(row.getValue<number>("createdAt"));
+      return (
+        <span className="text-xs text-muted-foreground tabular-nums">
+          {date.toLocaleDateString()}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "Actions",
@@ -90,61 +245,11 @@ export const getColumns = (
     cell: ({ row }) => {
       const booking = row.original;
       return (
-        <div className="flex items-center gap-2">
-          {/* View Booking - Eye Icon */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button size="icon" variant="ghost" className="h-8 w-8">
-                <Eye className="h-4 w-4" />
-                <span className="sr-only">View Booking</span>
-              </Button>
-            </SheetTrigger>
-            <ViewBooking booking={booking} />
-          </Sheet>
-
-          {/* Update Status Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="ghost" className="h-8 w-8">
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Update Status</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel className="text-xs">
-                Change Status
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => handleStatusUpdate(booking._id, "pending")}
-                disabled={booking.status === "pending"}
-              >
-                Pending
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleStatusUpdate(booking._id, "confirmed")}
-                disabled={booking.status === "confirmed"}
-              >
-                Confirmed
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleStatusUpdate(booking._id, "cancelled")}
-                disabled={booking.status === "cancelled"}
-              >
-                Cancelled
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Delete Button */}
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={() => handleDelete(booking._id)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
+        <ActionsCell
+          booking={booking}
+          handleDelete={handleDelete}
+          handleStatusUpdate={handleStatusUpdate}
+        />
       );
     },
   },

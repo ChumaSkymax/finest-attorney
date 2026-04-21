@@ -1,6 +1,7 @@
 "use client";
 
 import { ServiceSchema, serviceSchema } from "@/app/schema/serviceSchema";
+import editServiceAction from "@/app/ServerActions/editServiceAction";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -19,14 +20,30 @@ import { Spinner } from "@/components/ui/spinner";
 import { useForm, Controller } from "@/lib/react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import z from "zod";
 
-export default function EditService({ service }: { service: ServiceSchema }) {
+interface IService {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+  image: string | null;
+  createdBy: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export default function EditService({ service }: { service: IService }) {
   const [preview, setPreview] = useState<string | null>(service?.image || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const editSchema = serviceSchema.extend({
+    image: z.any().optional(),
+  });
+
   const form = useForm({
-    resolver: zodResolver(serviceSchema),
+    resolver: zodResolver(editSchema),
     defaultValues: {
       title: service?.title || "",
       slug: service?.slug || "",
@@ -35,13 +52,35 @@ export default function EditService({ service }: { service: ServiceSchema }) {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof serviceSchema>) => {
-    console.log("Updated values:", values);
-    setIsSubmitting(true);
+  const onSubmit = async (values: z.infer<typeof editSchema>) => {
+    try {
+      setIsSubmitting(true);
+      const formData = new FormData();
+      formData.append("_id", service._id);
+      formData.append("title", values.title);
+      formData.append("slug", values.slug);
+      formData.append("description", values.description);
+      // Only append the image if a new file was selected.
+      // We check `typeof values.image !== "string"` to ensure we're adding a File object,
+      // rather than an existing image URL or an empty value.
+      if (values.image && typeof values.image !== "string") {
+        formData.append("image", values.image);
+      }
 
-    setTimeout(() => {
+      const result = await editServiceAction(formData);
+      if (result.success) {
+        toast.success("Service updated successfully");
+        form.reset();
+        setPreview(null);
+      } else {
+        toast.error("Failed to update service");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to update service");
+    } finally {
       setIsSubmitting(false);
-    }, 2000);
+    }
   };
 
   return (

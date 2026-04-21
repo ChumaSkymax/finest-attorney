@@ -1,7 +1,7 @@
 "use client";
 
 import { bookingSchema } from "@/app/schema/bookingsSchema";
-import { serviceSchema } from "@/app/schema/serviceSchema";
+import { createBookingAction } from "@/app/ServerActions/createBoookingAction";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -20,6 +20,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useForm, Controller } from "@/lib/react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { toast } from "sonner";
 import z from "zod";
 
 export default function AddBookings() {
@@ -37,12 +38,17 @@ export default function AddBookings() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof bookingSchema>) => {
-    console.log(values);
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-    }, 3000);
+  const onSubmit = async (values: z.infer<typeof bookingSchema>) => {
+    setIsSubmitting(true);
+    const result = await createBookingAction(values);
+    console.log("Server Action Result:", result);
+    if (result.success) {
+      toast.success("Booking created successfully");
+      form.reset();
+    } else {
+      toast.error("Failed to create booking");
+    }
+    setIsSubmitting(false);
   };
 
   return (

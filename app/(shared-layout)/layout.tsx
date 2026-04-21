@@ -1,6 +1,8 @@
 import Footer from "@/components/web/Footer";
 import Navbar from "@/components/web/Navbar";
 
+import PagePadding from "@/components/web/PagePadding";
+
 export default function SharedLayout({
   children,
 }: {
@@ -9,7 +11,7 @@ export default function SharedLayout({
   return (
     <>
       <Navbar />
-      {children}
+      <PagePadding>{children}</PagePadding>
       <Footer />
     </>
   );

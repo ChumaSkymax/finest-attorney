@@ -20,33 +20,56 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import z from "zod";
 import teamDataSchema from "@/app/schema/teamDataSchema";
+import { TeamColumnType } from "@/app/(dashboard)/dashboard/manageTeam/columns";
+import editStaffAction from "@/app/ServerActions/editStaffAction";
+import { toast } from "sonner";
 
-export default function EditStaff({
-  member,
-}: {
-  member: z.infer<typeof teamDataSchema>;
-}) {
+export default function EditStaff({ member }: { member: TeamColumnType }) {
   const [preview, setPreview] = useState<string | null>(member.image || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Extend schema to allow optional images (since they only upload a new one if they want to override)
+  const editSchema = teamDataSchema.extend({
+    profileImage: z.any().optional(),
+  });
+
   const form = useForm({
-    resolver: zodResolver(teamDataSchema),
+    resolver: zodResolver(editSchema),
     defaultValues: {
-      _id: member._id,
-      name: member.name,
-      role: member.role,
-      image: member.image,
+      name: member.name || "",
+      position: member.position || "",
+      profileImage: undefined,
     },
   });
 
-  const onSubmit = (values: z.infer<typeof teamDataSchema>) => {
-    console.log("Updated staff member:", values);
-    setIsSubmitting(true);
+  const onSubmit = async (values: z.infer<typeof editSchema>) => {
+    try {
+      setIsSubmitting(true);
+      const formData = new FormData();
+      formData.append("_id", member._id);
+      formData.append("name", values.name);
+      formData.append("role", values.position); // Note mapping to "role" in formData to match editStaffAction.ts
 
-    // TODO: Replace with your actual API call
-    setTimeout(() => {
+      // Attach file properly if uploaded
+      if (values.profileImage instanceof File) {
+        formData.append("image", values.profileImage);
+      }
+
+      const result = await editStaffAction(formData);
+
+      if (result.success) {
+        toast.success("Staff member updated effectively.");
+        form.reset();
+        // Option to close sheet automatically or reset state
+      } else {
+        toast.error((result as any).error || "Failed updates implicitly.");
+      }
+    } catch (error) {
+      console.log("Submit error:", error);
+      toast.error("An error occurred cleanly.");
+    } finally {
       setIsSubmitting(false);
-    }, 3000);
+    }
   };
 
   return (
@@ -76,8 +99,6 @@ export default function EditStaff({
                   type="text"
                   placeholder="Enter full name"
                   autoComplete="name"
-                  aria-invalid={fieldState.invalid}
-                  required
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -86,9 +107,9 @@ export default function EditStaff({
             )}
           />
 
-          {/* ROLE */}
+          {/* ROLE / POSITION */}
           <Controller
-            name="role"
+            name="position"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
@@ -101,8 +122,6 @@ export default function EditStaff({
                   type="text"
                   placeholder="e.g. Senior Advocate"
                   autoComplete="off"
-                  aria-invalid={fieldState.invalid}
-                  required
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -113,7 +132,7 @@ export default function EditStaff({
 
           {/* IMAGE */}
           <Controller
-            name="image"
+            name="profileImage"
             control={form.control}
             render={({ field }) => (
               <>
@@ -141,7 +160,7 @@ export default function EditStaff({
                   <img
                     src={preview}
                     alt="Preview"
-                    className="w-8 h-8 object-cover mt-3 rounded-full border"
+                    className="w-12 h-12 object-cover mt-3 rounded-md border"
                   />
                 )}
               </>

@@ -8,8 +8,14 @@
  * @module
  */
 
+import type * as bookings from "../bookings.js";
+import type * as dashboard from "../dashboard.js";
 import type * as http from "../http.js";
+import type * as legalupdates from "../legalupdates.js";
+import type * as services from "../services.js";
 import type * as tasks from "../tasks.js";
+import type * as team from "../team.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -18,8 +24,14 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  bookings: typeof bookings;
+  dashboard: typeof dashboard;
   http: typeof http;
+  legalupdates: typeof legalupdates;
+  services: typeof services;
   tasks: typeof tasks;
+  team: typeof team;
+  users: typeof users;
 }>;
 
 /**
@@ -63,6 +75,7 @@ export declare const components: {
                   emailVerified: boolean;
                   image?: null | string;
                   name: string;
+                  phone?: null | string;
                   updatedAt: number;
                   userId?: null | string;
                 };
@@ -138,6 +151,7 @@ export declare const components: {
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "phone"
                     | "_id";
                   operator?:
                     | "lt"
@@ -325,6 +339,7 @@ export declare const components: {
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "phone"
                     | "_id";
                   operator?:
                     | "lt"
@@ -576,6 +591,7 @@ export declare const components: {
                   emailVerified?: boolean;
                   image?: null | string;
                   name?: string;
+                  phone?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -589,6 +605,7 @@ export declare const components: {
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "phone"
                     | "_id";
                   operator?:
                     | "lt"
@@ -808,6 +825,7 @@ export declare const components: {
                   emailVerified?: boolean;
                   image?: null | string;
                   name?: string;
+                  phone?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -821,6 +839,7 @@ export declare const components: {
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "phone"
                     | "_id";
                   operator?:
                     | "lt"

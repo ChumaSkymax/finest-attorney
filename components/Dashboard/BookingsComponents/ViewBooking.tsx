@@ -23,12 +23,14 @@ interface BookingDetails {
   name: string;
   email: string;
   phone: string;
-  service: string;
+  serviceBooked: string;
   preferredDate: string;
   preferredTime: string;
   message: string;
+  createdBy: string;
   status: string;
-  createdAt: string;
+  createdAt: number;
+  updatedAt: number;
 }
 
 interface Props {
@@ -113,7 +115,7 @@ export default function ViewBooking({ booking }: Props) {
               <Scale className="h-4 w-4 text-muted-foreground shrink-0" />
               <div>
                 <p className="text-xs text-muted-foreground">Service</p>
-                <p className="text-sm font-medium">{booking.service}</p>
+                <p className="text-sm font-medium">{booking.serviceBooked}</p>
               </div>
             </div>
 
@@ -148,7 +150,7 @@ export default function ViewBooking({ booking }: Props) {
         {/* Meta */}
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>Booking ID: {booking._id}</span>
-          <span>Created: {booking.createdAt}</span>
+          <span>Created: {new Date(booking.createdAt).toLocaleDateString()}</span>
         </div>
       </div>
     </SheetContent>

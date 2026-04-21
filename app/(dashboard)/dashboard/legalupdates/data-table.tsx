@@ -36,8 +36,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
-      <div className="rounded-md border">
+    <div className="w-full max-w-4xl mx-auto space-y-4">
+      <div className="rounded-md border bg-card w-full">
         <ScrollArea className="h-[500px] w-full">
           <Table className="min-w-[700px]">
             <TableHeader>
@@ -89,6 +89,8 @@ export function DataTable<TData, TValue>({
           </Table>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
+      </div>
+      <div>
         <DataTablePagination table={table} />
       </div>
     </div>

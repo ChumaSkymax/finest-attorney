@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Poppins } from "next/font/google";
+import { Playfair_Display, Poppins } from "next/font/google";
 import SoftBackdrop from "@/components/web/softBackdrop";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { cookies } from "next/headers";
@@ -13,6 +13,12 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair-display",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -30,7 +36,9 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.variable} font-poppins `}>
+      <body
+        className={`${poppins.variable} font-poppins ${playfairDisplay.variable}   `}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

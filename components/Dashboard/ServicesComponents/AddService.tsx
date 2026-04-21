@@ -1,6 +1,7 @@
 "use client";
 
 import { serviceSchema } from "@/app/schema/serviceSchema";
+import createServiceAction from "@/app/ServerActions/createServiceAction";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -19,7 +20,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { useForm, Controller } from "@/lib/react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { toast } from "sonner";
 import z from "zod";
+
+const generateSlug = (value: string) => {
+  return value
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+};
 
 export default function AddService() {
   const [preview, setPreview] = useState<string | null>(null);
@@ -34,12 +43,30 @@ export default function AddService() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof serviceSchema>) => {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof serviceSchema>) => {
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("slug", values.slug);
+      formData.append("description", values.description);
+      if (values.image) {
+        formData.append("image", values.image);
+      }
 
-    setTimeout(() => {
+      const result = await createServiceAction(formData);
+      if (result.success) {
+        toast.success("Service created successfully");
+        form.reset();
+        setPreview(null);
+      } else {
+        toast.error("Failed to create service");
+      }
+    } catch (error) {
+      console.log("Error creating services:", error);
+    } finally {
       setIsSubmitting(false);
-    }, 3000);
+    }
   };
 
   return (
@@ -64,6 +91,11 @@ export default function AddService() {
                       autoComplete="title"
                       aria-invalid={fieldState.invalid}
                       required
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(value);
+                        form.setValue("slug", generateSlug(value));
+                      }}
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -82,11 +114,10 @@ export default function AddService() {
                     <Input
                       {...field}
                       id="service-slug"
-                      type="text"
                       placeholder="eg. corporate-commercial-law"
-                      autoComplete="slug"
                       aria-invalid={fieldState.invalid}
                       required
+                      disabled
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />

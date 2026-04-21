@@ -19,6 +19,8 @@ import { Spinner } from "../ui/spinner";
 import z from "zod";
 import { useState } from "react";
 import { bookingSchema } from "@/app/schema/bookingsSchema";
+import { toast } from "sonner";
+import { createBookingAction } from "@/app/ServerActions/createBoookingAction";
 
 export default function BookConsultation() {
   const { isOpen, closeModal } = useConsultationModal();
@@ -37,15 +39,18 @@ export default function BookConsultation() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof bookingSchema>) => {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof bookingSchema>) => {
     setIsSubmitting(true);
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-    }, 3000);
+    const result = await createBookingAction(values);
+    console.log("Server Action Result:", result);
+    if (result.success) {
+      toast.success("Booking created successfully");
+      form.reset();
+    } else {
+      toast.error("Failed to create booking");
+    }
+    setIsSubmitting(false);
   };
-
   if (!isOpen) return null;
 
   return (
@@ -65,15 +70,15 @@ export default function BookConsultation() {
           <span className="sr-only">Close</span>
         </Button>
         <CardHeader className="mt-10">
-          {/* <CardTitle>Book a Legal Consultation</CardTitle> */}
-          {/* <CardDescription>
+          <CardTitle>Book a Legal Consultation</CardTitle>
+          <CardDescription>
             Schedule a consultation with our experienced attorneys to discuss
             your legal matter.
-          </CardDescription> */}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 ">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Controller
                 name="name"
                 control={form.control}
@@ -87,7 +92,7 @@ export default function BookConsultation() {
                       {...field}
                       id="name"
                       type="text"
-                      placeholder="Enter Name"
+                      placeholder="Enter Your Name"
                       autoComplete="name"
                       aria-invalid={fieldState.invalid}
                       required
@@ -111,7 +116,7 @@ export default function BookConsultation() {
                       {...field}
                       id="email"
                       type="email"
-                      placeholder="Enter Email"
+                      placeholder="Enter Your Email"
                       autoComplete="email"
                       aria-invalid={fieldState.invalid}
                       required
@@ -133,7 +138,7 @@ export default function BookConsultation() {
                       {...field}
                       id="phone"
                       type="tel"
-                      placeholder="Enter Phone"
+                      placeholder="Enter Your Phone"
                       autoComplete="phone"
                       aria-invalid={fieldState.invalid}
                       required

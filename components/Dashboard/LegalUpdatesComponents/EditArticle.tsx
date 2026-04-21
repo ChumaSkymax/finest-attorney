@@ -1,3 +1,21 @@
+/**
+ * ========================================================
+ * EDIT ARTICLE COMPONENT - Complete Guide for Future Projects
+ * ========================================================
+ * This is a highly robust "Form" component inside a sliding Sheet UI.
+ * 
+ * CORE ARCHITECTURE HOW-TO:
+ * 1. Validation (Zod): We use a schema called `legalUpdatesSchema` to strictly force the user to type valid text (min lengths, etc). 
+ * 2. Form Hook (React Hook Form): We feed that Zod schema into `useForm()`. This wires up all the text inputs automatically!
+ * 3. FormData (The Engine): Because this form *can* upload actual image Files, we can't just send regular Javascript objects.
+ *    Instead, we manually append every text field and the raw Image File into a physical `new FormData()` payload!
+ * 4. Server Action: We send that massive `FormData` payload securely down to `editLegalUpdateAction` which processes the image upload 
+ *    behind the scenes and then patches the database.
+ * 
+ * PRO-TIP for Image Previews:
+ * Notice the `onChange` event directly on the standard `<Input type="file" />`. We use JavaScript's `FileReader()` 
+ * to temporarily grab the new image the user just clicked, convert it to a local string URL, and instantly show it to them in `setPreview()`!
+ */
 "use client";
 
 import { legalUpdatesSchema } from "@/app/schema/legalUpdatesSchema";
@@ -16,41 +34,81 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
+import { editLegalUpdateAction } from "@/app/ServerActions/editLegalUpdateAction";
 import { useForm, Controller } from "@/lib/react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import z from "zod";
 
-export default function EditArticle({
-  article,
-}: {
-  article: legalUpdatesSchema;
-}) {
+export interface ArticleData {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+  publishedAt: string;
+  readTime: string;
+  featuredImage?: string | null;
+  author?: string;
+  createdAt?: number;
+  updatedAt?: number;
+}
+
+export default function EditArticle({ article }: { article: ArticleData }) {
   const [preview, setPreview] = useState<string | null>(
     article?.featuredImage || null,
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm({
-    resolver: zodResolver(legalUpdatesSchema),
+  const editSchema = legalUpdatesSchema.extend({
+    featuredImage: z.any().optional(),
+  });
+
+  const form = useForm<z.infer<typeof editSchema>>({
+    resolver: zodResolver(editSchema),
     defaultValues: {
       title: article?.title || "",
       slug: article?.slug || "",
       description: article?.description || "",
       publishedAt: article?.publishedAt || "",
       readTime: article?.readTime || "",
-      author: article?.author || "",
-      featuredImage: article?.featuredImage || "",
+      featuredImage: article?.featuredImage || undefined,
     },
   });
 
-  const onSubmit = (values: z.infer<typeof legalUpdatesSchema>) => {
-    console.log("Updated values:", values);
-    setIsSubmitting(true);
+  const onSubmit = async (values: z.infer<typeof editSchema>) => {
+    try {
+      setIsSubmitting(true);
+      const formData = new FormData();
+      formData.append("id", article._id);
+      formData.append("title", values.title);
+      formData.append("slug", values.slug);
+      formData.append("description", values.description);
+      formData.append("publishedAt", values.publishedAt);
+      formData.append("readTime", values.readTime);
+      if (values.featuredImage && typeof values.featuredImage !== "string") {
+        formData.append("featuredImage", values.featuredImage);
+      }
 
-    setTimeout(() => {
+      const result = await editLegalUpdateAction(formData);
+
+      if (result.success) {
+        toast.success("Article updated successfully");
+        form.reset();
+        setPreview(null);
+      } else {
+        toast.error(
+          "error" in result
+            ? (result.error as string)
+            : "Failed to update article",
+        );
+      }
+    } catch (error) {
+      console.error("editLegalUpdateAction error:", error);
+      toast.error("Failed to update article");
+    } finally {
       setIsSubmitting(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -199,10 +257,10 @@ export default function EditArticle({
           {/* SUBMIT */}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? (
-              <>
+              <div className="flex justify-center items-center gap-2">
                 <Spinner className="mr-2 h-4 w-4 animate-spin" />
                 Updating...
-              </>
+              </div>
             ) : (
               "Update Article"
             )}

@@ -6,15 +6,16 @@ import { CoreValues } from "@/data/data";
 import Title from "@/components/web/Title";
 import getTeamData from "@/data/teamData";
 import { Separator } from "@/components/ui/separator";
+import Team from "@/components/web/team";
 
 export default function () {
   const data = getTeamData();
   return (
-    <div className="relative mt-28">
+    <div className="relative mt-8">
       <div className="max-w-6xl mx-auto px-4 ">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center mb-20">
           <Image
-            src="/images/finest-banner2.jpg"
+            src="/images/finest-banner3.jpg"
             alt=""
             width={800}
             height={500}
@@ -152,31 +153,7 @@ export default function () {
           </div>
         </div>
         {/* team section  */}
-        <div className="flex flex-col mt-12 gap-6 ">
-          <Title
-            title="Meet Our Team"
-            description="Meet the legal minds behind Finest Attorneys, dedicated to providing expert legal solutions."
-          />
-          <div className="flex flex-wrap items-center justify-center gap-10 md:gap-6 mt-6">
-            {data.map((member, index) => (
-              <AnimatedContent
-                delay={index * 0.1}
-                key={index}
-                className="flex flex-col border border-primary/20  rounded-lg p-6 shadow-lg "
-              >
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  className="w-52 h-64 object-cover rounded-lg"
-                />
-                <h3 className="text-lg font-medium mt-2 text-foreground">
-                  {member.name}
-                </h3>
-                <p className="text-muted-foreground">{member.role}</p>
-              </AnimatedContent>
-            ))}
-          </div>
-        </div>
+
         <div className="flex flex-col md:flex-row items-center justify-center gap-10 max-md:px-4 mt-16 mb-8">
           <div className="relative shadow-2xl shadow-primary/40 rounded-2xl overflow-hidden shrink-0">
             <img

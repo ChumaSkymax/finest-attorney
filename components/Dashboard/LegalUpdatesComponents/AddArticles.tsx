@@ -1,6 +1,7 @@
 "use client";
 
 import { legalUpdatesSchema } from "@/app/schema/legalUpdatesSchema";
+import { addLegalUpdateAction } from "@/app/ServerActions/addLegalUpdateAction";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -19,6 +20,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useForm, Controller } from "@/lib/react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { toast } from "sonner";
 import z from "zod";
 
 const generateSlug = (value: string) => {
@@ -42,18 +44,39 @@ export default function AddArticles() {
       description: "",
       publishedAt: "",
       readTime: "",
-      author: "",
-      featuredImage: "",
+      featuredImage: undefined,
     },
   });
 
-  const onSubmit = (values: z.infer<typeof legalUpdatesSchema>) => {
-    console.log("Updated values:", values);
+  const onSubmit = async (values: z.infer<typeof legalUpdatesSchema>) => {
     setIsSubmitting(true);
 
-    setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("slug", values.slug);
+      formData.append("description", values.description);
+      formData.append("publishedAt", values.publishedAt);
+      formData.append("readTime", values.readTime);
+      if (values.featuredImage) {
+        formData.append("featuredImage", values.featuredImage);
+      }
+
+      const result = await addLegalUpdateAction(formData);
+      console.log("Result:", result);
+      if (result.success) {
+        toast.success("Article created successfully");
+        form.reset();
+        setPreview(null);
+      } else {
+        toast.error("Failed to create article");
+      }
+    } catch (error) {
+      console.error("Error submitting article:", error);
+      toast.error("Failed to create article");
+    } finally {
       setIsSubmitting(false);
-    }, 5000);
+    }
   };
 
   return (
@@ -142,6 +165,7 @@ export default function AddArticles() {
                 </FieldLabel>
                 <Input
                   {...field}
+                  type="date"
                   id="article-publishedAt"
                   placeholder="Enter Article Published Date"
                 />
@@ -208,10 +232,10 @@ export default function AddArticles() {
           {/* SUBMIT */}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? (
-              <>
-                <Spinner className="mr-2 h-4 w-4 animate-spin" />
-                Adding...
-              </>
+              <div className="flex justify-center items-center gap-2">
+                <Spinner className="h-4 w-4 animate-spin" />
+                Adding Article...
+              </div>
             ) : (
               "Add Article"
             )}

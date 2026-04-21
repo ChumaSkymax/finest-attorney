@@ -18,8 +18,10 @@ import { Spinner } from "@/components/ui/spinner";
 import { useForm, Controller } from "@/lib/react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { toast } from "sonner";
 import z from "zod";
 import teamDataSchema from "@/app/schema/teamDataSchema";
+import createTeamMemberAction from "@/app/ServerActions/createTeamMemberAction";
 
 export default function AddStaff() {
   const [preview, setPreview] = useState<string | null>(null);
@@ -29,19 +31,35 @@ export default function AddStaff() {
     resolver: zodResolver(teamDataSchema),
     defaultValues: {
       name: "",
-      role: "",
-      image: "",
+      position: "",
+      profileImage: undefined,
     },
   });
 
-  const onSubmit = (values: z.infer<typeof teamDataSchema>) => {
-    console.log("Updated staff member:", values);
+  const onSubmit = async (values: z.infer<typeof teamDataSchema>) => {
     setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("position", values.position);
+      if (values.profileImage) {
+        formData.append("profileImage", values.profileImage);
+      }
 
-    // TODO: Replace with your actual API call
-    setTimeout(() => {
+      const result = await createTeamMemberAction(formData);
+      if (result.success) {
+        toast.success("Team member added successfully");
+        form.reset();
+        setPreview(null);
+      } else {
+        toast.error("Failed to add team member");
+      }
+    } catch (error) {
+      console.error("Error adding team member:", error);
+      toast.error("Failed to add team member");
+    } finally {
       setIsSubmitting(false);
-    }, 3000);
+    }
   };
 
   return (
@@ -79,18 +97,18 @@ export default function AddStaff() {
             )}
           />
 
-          {/* ROLE */}
+          {/* POSITION */}
           <Controller
-            name="role"
+            name="position"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="add-staff-role">
+                <FieldLabel htmlFor="add-staff-position">
                   Role / Position
                 </FieldLabel>
                 <Input
                   {...field}
-                  id="add-staff-role"
+                  id="add-staff-position"
                   type="text"
                   placeholder="e.g. Senior Advocate"
                   autoComplete="off"
@@ -106,9 +124,9 @@ export default function AddStaff() {
 
           {/* IMAGE */}
           <Controller
-            name="image"
+            name="profileImage"
             control={form.control}
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <>
                 <FieldLabel>Profile Photo</FieldLabel>
                 <Input
@@ -129,6 +147,9 @@ export default function AddStaff() {
                     reader.readAsDataURL(file);
                   }}
                 />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
 
                 {preview && (
                   <img
@@ -144,12 +165,12 @@ export default function AddStaff() {
           {/* SUBMIT */}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? (
-              <>
+              <div className="flex items-center justify-center gap-2">
                 <Spinner className="mr-2 h-4 w-4 animate-spin" />
-                Updating...
-              </>
+                Adding Team Member...
+              </div>
             ) : (
-              "Update Staff Member"
+              "Add Staff Member"
             )}
           </Button>
         </FieldGroup>

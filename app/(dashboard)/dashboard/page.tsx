@@ -10,7 +10,7 @@ import PopularArticles from "@/components/Dashboard/HomePageComponents/PopularAr
 
 export default function DashboardHomePage() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 px-4 max-w-5xl mx-auto">
       <CardsStatsSection />
 
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2">

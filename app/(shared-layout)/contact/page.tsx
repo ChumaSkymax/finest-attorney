@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import Title from "@/components/web/Title";
 import AnimatedContent from "@/components/web/AnimatedContent";
+import { toast } from "sonner";
 
 export default function ContactPage() {
   const [formState, setFormState] = useState({
@@ -30,8 +31,29 @@ export default function ContactPage() {
     setFormState({ ...formState, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    formData.append("to", "[EMAIL_ADDRESS]");
+
+    const object = Object.fromEntries(formData);
+    console.log(object);
+    const json = JSON.stringify(object);
+    console.log("json: ", json);
+
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: json,
+    });
+
+    const results = await res.json();
+    toast;
+    console.log("results: ", results);
+
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 4000);
     setFormState({ name: "", email: "", phone: "", message: "" });
@@ -48,7 +70,7 @@ export default function ContactPage() {
     {
       icon: PhoneIcon,
       label: "Phone Number",
-      value: "+255 684 615 956",
+      value: "+255 222 127 395",
       subValue: null,
     },
     {
@@ -66,13 +88,13 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="relative mt-28 mb-20">
+    <div className="relative mt-8 mb-20">
       <div className="max-w-6xl mx-auto px-4">
         {/* Page Header */}
-        <Title
+        {/* <Title
           title="Speak With Us"
           description="We'd love to hear from you. Reach out for expert legal guidance, consultations, or any inquiries about our services."
-        />
+        /> */}
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-8">

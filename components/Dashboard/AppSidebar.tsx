@@ -1,15 +1,13 @@
+"use client";
+
 import {
   Book,
   Calendar,
-  ChevronDownIcon,
   ChevronUp,
   Home,
-  Inbox,
-  Plus,
-  Projector,
-  Search,
+  Lock,
+  LogOut,
   ServerIcon,
-  Settings,
   User,
   User2,
 } from "lucide-react";
@@ -29,6 +27,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarTrigger,
 } from "../ui/sidebar";
 import Link from "next/link";
 
@@ -44,26 +43,30 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import { Button } from "../ui/button";
-import { div } from "framer-motion/client";
+import Image from "next/image";
+import { ThemeToggle } from "../web/theme-toggle";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const items = [
   {
-    title: "Home",
+    title: "Overview",
     url: "/dashboard",
     icon: Home,
   },
   {
-    title: "Manage Services",
+    title: "Services",
     url: "/dashboard/services",
     icon: ServerIcon,
   },
   {
-    title: "Manage Team",
+    title: "Team",
     url: "/dashboard/manageTeam",
     icon: User,
   },
   {
-    title: "Manage Bookings",
+    title: "Bookings",
     url: "/dashboard/bookings",
     icon: Calendar,
   },
@@ -71,15 +74,37 @@ const items = [
 ];
 
 export default function AppSidebar() {
+  const { data: session } = authClient.useSession();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Logged out successfully");
+          router.push("/auth/login");
+        },
+        onError: () => {
+          toast.error("Failed to log out");
+        },
+      },
+    });
+  };
+
   return (
     <Sidebar className="border-r bg-background" collapsible="icon">
       <SidebarHeader className="py-4">
         <SidebarMenu>
-          <SidebarMenuItem>
+          <SidebarMenuItem className="flex items-center justify-between ">
             <SidebarMenuButton asChild>
               <Link href="/">
-                <Home />
-                <span>Home</span>
+                <Image
+                  src="/images/logo.svg"
+                  alt="Finest Attorneys"
+                  width={260}
+                  height={70}
+                  className="h-10 md:h-10 w-auto"
+                />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -107,7 +132,7 @@ export default function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
+        {/* <SidebarGroup>
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarGroupAction>
             <Plus /> <span className="sr-only">Add Project</span>
@@ -132,10 +157,10 @@ export default function AppSidebar() {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
 
         {/* COLLAPSIBLE  */}
-        <Collapsible className="data-[state=open]:bg-muted rounded-md m-3 ">
+        {/* <Collapsible className="data-[state=open]:bg-muted rounded-md m-3 ">
           <SidebarGroup className="">
             <SidebarGroupLabel>Collapsible</SidebarGroupLabel>
             <CollapsibleTrigger asChild>
@@ -167,9 +192,9 @@ export default function AppSidebar() {
               </SidebarGroupContent>
             </CollapsibleContent>
           </SidebarGroup>
-        </Collapsible>
+        </Collapsible> */}
 
-        <SidebarGroup>
+        {/* <SidebarGroup>
           <SidebarGroupLabel>Nested Items</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -201,7 +226,7 @@ export default function AppSidebar() {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
 
         {/* <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -244,13 +269,31 @@ export default function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> John Doe <ChevronUp className="ml-auto" />
+                  <User2 />
+                  <div className="flex flex-col text-left">
+                    <span className="text-sm font-medium leading-none">
+                      {session?.user?.name ?? "Loading..."}
+                    </span>
+                    <span className="text-xs text-muted-foreground truncate max-w-[140px]">
+                      {session?.user?.email ?? ""}
+                    </span>
+                  </div>
+                  <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Account</DropdownMenuItem>
-                <DropdownMenuItem>Setting</DropdownMenuItem>
-                <DropdownMenuItem>Sign out</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <User2 /> Account
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Lock /> Security
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive cursor-pointer"
+                  onClick={handleSignOut}
+                >
+                  <LogOut /> Sign out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

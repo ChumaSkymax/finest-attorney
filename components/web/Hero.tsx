@@ -9,6 +9,7 @@ import {
 import { Button } from "../ui/button";
 import Link from "next/link";
 import BookConsultationButton from "./BookConsultationButton";
+import HeroCard from "./HeroCard";
 
 export default function Hero() {
   const trustedUserImages = [
@@ -27,104 +28,71 @@ export default function Hero() {
 
   return (
     <>
-      <section id="home" className="relative z-10">
-        <div className="max-w-6xl mx-auto px-4 min-h-screen max-md:w-screen max-md:overflow-hidden pt-32 md:pt-26 flex items-center justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-            <div className="text-left">
+      <section
+        id="home"
+        className="relative z-10 w-full min-h-screen bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage:
+            "url('https://amicable-spaniel-706.eu-west-1.convex.cloud/api/storage/29664e23-fc8d-452e-8861-c0ce69706f98')",
+        }}
+      >
+        {/* Dark overlay so text stays readable on any background image */}
+        <div className="absolute inset-0 bg-black/40 z-0" />
+
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen pt-24 sm:pt-28 md:pt-32 pb-10 flex items-center justify-center">
+          <div className="flex flex-col justify-center items-center w-full">
+            <div className="text-center w-full max-w-3xl mx-auto">
+              {/* Badge
               <Link
                 href="/about-us"
-                className="inline-flex items-center gap-3 pl-3 pr-4 py-1.5 
-                rounded-full bg-primary dark:bg-primary/60 
-                 dark:text-foreground 
-                shadow-lg shadow-md mb-6 justify-start"
+                className="inline-flex items-center gap-2 pl-3 pr-3 py-1.5
+                  rounded-full bg-primary/90 shadow-lg mb-6 justify-center
+                  max-w-[90vw] flex-wrap"
               >
-                <div className="flex -space-x-2"></div>
-                <span className="text-xs text-white dark:text-gray-100">
+                <span className="text-xs text-white leading-snug">
                   We are trusted legal advisors to businesses across various
                   sectors.
                 </span>
-                <div className="flex items-center gap-1 rounded-full bg-white  px-2 py-2">
-                  <ArrowRightIcon className="size-4 dark:text-primary " />
+                <div className="shrink-0 flex items-center rounded-full bg-white px-2 py-1.5">
+                  <ArrowRightIcon className="size-3.5 text-primary" />
                 </div>
-              </Link>
-
-              <h1 className="text-4xl md:text-4xl font-bold leading-tight mb-6 max-w-xl">
-                We are a full service law firm based <br />
-                <span className="bg-clip-text text-transparent bg-linear-to-r from-primary to-primary/10">
-                  in Dar es Salaam, Tanzania
+              </Link> */}
+              {/* Heading */}
+              <h1 className="text-2xl font-playfair-display sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-8 mt-10 text-white mx-auto ">
+                We are a full service law firm{" "}
+                <span className="text-white/90">
+                  based in Dar es Salaam, Tanzania
                 </span>
               </h1>
-
-              <p className="text-sm text-foreground/60 max-w-lg mb-8">
+              {/* Subtext */}
+              <p className="text-sm sm:text-base text-white max-w-xl mx-auto mb-8 px-2 sm:px-0 leading-relaxed">
                 Providing strategic, reliable and results driven legal services
                 to both local and international clients. Established in 2014,
                 the firm has built a strong reputation for excellence in
                 corporate, commercial and litigation practice.
               </p>
-
-              <div className="flex flex-col sm:flex-row items-center gap-2 mb-8">
-                <Link href="/practise-area" className="w-full sm:w-auto ">
+              {/* CTA buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8 w-full">
+                <Link href="/practise-areas" className="w-full sm:w-auto">
                   <Button
-                    className="w-full py-6 px-7 rounded-full 
-                  text-sm cursor-pointer px-4 py-2 bg-transparent border border-primary 
-                  text-primary hover:bg-primary/80 hover:text-gray-200"
+                    className="w-full sm:w-auto py-5 px-6 rounded-full text-sm
+                      cursor-pointer bg-white border border-primary
+                      text-primary hover:bg-primary hover:text-primary transition-colors"
                   >
-                    <AwardIcon />
+                    <AwardIcon className="size-4" />
                     10+ Years of experience
                   </Button>
                 </Link>
 
-                <BookConsultationButton />
+                <div className="w-full sm:w-auto">
+                  <BookConsultationButton />
+                </div>
               </div>
             </div>
 
-            {/* Right */}
-            <div className="mx-auto w-full max-w-lg">
-              <div className="rounded-3xl overflow-hidden border border-white/6 shadow-2xl bg-linear-to-b from-black/50 to-transparent">
-                <div className="relative aspect-16/10 bg-gray-900">
-                  <img
-                    src={mainImageUrl}
-                    alt="agency-work-preview"
-                    className="w-full h-full object-cover object-center"
-                  />
-
-                  <div className="absolute left-4 top-4 px-3 py-1 rounded-full bg-black/15 backdrop-blur-sm text-xs">
-                    Experience • Integrity • Results
-                  </div>
-
-                  <div className="absolute right-4 bottom-4">
-                    <button className="inline-flex items-center gap-2 rounded-full px-4 py-2 bg-white/6 backdrop-blur-sm hover:bg-white/10 transition focus:outline-none">
-                      <div className="bg-primary p-2 rounded-full">
-                        <ArrowRightIcon className="size-4" />
-                      </div>
-                      <span className="text-xs">View Practice Area</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 flex gap-3 items-center justify-start">
-                {galleryStripImages.map((src, i) => (
-                  <div
-                    key={i}
-                    className="w-14 h-10 rounded-lg overflow-hidden border border-white/6"
-                  >
-                    <img
-                      src={src}
-                      alt="project-thumbnail"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-                <div className="text-sm text-gray-400 ml-2 flex items-center gap-2">
-                  <div className="relative flex h-3.5 w-3.5 items-center justify-center">
-                    <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 animate-ping duration-300" />
-
-                    <span className="relative inline-flex size-2 rounded-full bg-primary" />
-                  </div>
-                  500+ Completed cases
-                </div>
-              </div>
+            {/* Hero cards carousel */}
+            <div className="w-full">
+              <HeroCard />
             </div>
           </div>
         </div>

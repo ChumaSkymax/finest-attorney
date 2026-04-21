@@ -1,17 +1,19 @@
 "use client";
 
-import teamDataSchema from "@/app/schema/teamDataSchema";
 import EditStaff from "@/components/Dashboard/TeamComponents/EditStaff";
 import ViewStaff from "@/components/Dashboard/TeamComponents/ViewStaff";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { ColumnDef } from "@tanstack/react-table";
 import { Edit2Icon, Eye, Trash } from "lucide-react";
-import z from "zod";
+
+import { Doc } from "@/convex/_generated/dataModel";
+
+export type TeamColumnType = Doc<"team"> & { image: string | null };
 
 export const getColumns = (
   handleDelete: (id: string) => void,
-): ColumnDef<z.infer<typeof teamDataSchema>>[] => [
+): ColumnDef<TeamColumnType>[] => [
   {
     accessorKey: "image",
     header: "Photo",
@@ -33,8 +35,8 @@ export const getColumns = (
     header: "Name",
   },
   {
-    accessorKey: "role",
-    header: "Role",
+    accessorKey: "position",
+    header: "Role / Position",
   },
   {
     accessorKey: "Actions",
@@ -68,7 +70,7 @@ export const getColumns = (
           {/* Delete Staff */}
           <Button
             size="icon"
-            variant="destructive"
+            variant="outline"
             className="h-8 w-8"
             onClick={() => handleDelete(member._id)}
           >

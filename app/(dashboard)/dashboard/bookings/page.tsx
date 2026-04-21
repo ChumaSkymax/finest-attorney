@@ -1,101 +1,74 @@
+/**
+ * ========================================================
+ * BACKEND DATA TABLE COMPONENT - (Bookings Dashboard Page)
+ * ========================================================
+ * This is exactly how you connect a database securely into a beautiful Table layout!
+ *
+ * HOW THIS PAGE WORKS:
+ * 1. `useQuery`: We instantly ping the Convex database directly from the frontend to fetch all `bookings` via `api.bookings.getBookings`.
+ * 2. Loading State: It takes a few milliseconds for data to come back over the internet. While `bookings` is `undefined`,
+ *    we display a nice pulsing `<DataTableSkeleton />` so the page doesn't glitch or look frozen!
+ * 3. `useMutation`: We define database-altering actions (like `deleteBooking` or `updateBookingStatus`) here at the parent level.
+ * 4. The Magic Handoff: We wrap all those powerful mutations into simple functions (like `handleDelete`),
+ *    and pass them deep into `getColumns()`. That way, the tiny little <Button> running inside the table's "Action" column
+ *    can magically trigger massive database deletes securely from the parent context!
+ */
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { BookingsData, getColumns } from "./columns";
+import { getColumns } from "./columns";
 import { DataTable } from "./data-table";
 import AddBookings from "@/components/Dashboard/BookingsComponents/Addbookings";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
-
-const getBookings = (): BookingsData[] => {
-  return [
-    {
-      _id: "b1",
-      name: "John Mwakyusa",
-      email: "john.mwakyusa@gmail.com",
-      phone: "+255712345678",
-      service: "Corporate and Commercial Law",
-      preferredDate: "2026-03-05",
-      preferredTime: "10:00 AM",
-      message: "Seeking legal advice on company registration.",
-      status: "pending",
-      createdAt: "2026-02-20",
-    },
-    {
-      _id: "b2",
-      name: "Asha Mohamed",
-      email: "asha.mohamed@yahoo.com",
-      phone: "+255754987321",
-      service: "Labour Law",
-      preferredDate: "2026-03-07",
-      preferredTime: "02:00 PM",
-      message: "Need assistance with an employment dispute.",
-      status: "confirmed",
-      createdAt: "2026-02-21",
-    },
-    {
-      _id: "b3",
-      name: "Peter Kimaro",
-      email: "peter.kimaro@gmail.com",
-      phone: "+255718223344",
-      service: "Real Estate and Conveyancing",
-      preferredDate: "2026-03-10",
-      preferredTime: "09:00 AM",
-      message: "Legal support for land transfer process.",
-      status: "pending",
-      createdAt: "2026-02-22",
-    },
-    {
-      _id: "b4",
-      name: "Neema Joseph",
-      email: "neema.joseph@outlook.com",
-      phone: "+255762998877",
-      service: "Intellectual Property and Trademarks",
-      preferredDate: "2026-03-12",
-      preferredTime: "11:30 AM",
-      message: "Trademark registration for my business.",
-      status: "cancelled",
-      createdAt: "2026-02-22",
-    },
-    {
-      _id: "b5",
-      name: "David Mushi",
-      email: "david.mushi@gmail.com",
-      phone: "+255713445566",
-      service: "Litigation and Arbitration",
-      preferredDate: "2026-03-15",
-      preferredTime: "03:30 PM",
-      message: "Representation in a commercial dispute.",
-      status: "confirmed",
-      createdAt: "2026-02-23",
-    },
-    {
-      _id: "b6",
-      name: "Fatma Hassan",
-      email: "fatma.hassan@gmail.com",
-      phone: "+255755667788",
-      service: "Insurance Law",
-      preferredDate: "2026-03-18",
-      preferredTime: "04:00 PM",
-      message: "Advice regarding an insurance claim.",
-      status: "pending",
-      createdAt: "2026-02-24",
-    },
-  ];
-};
+import { DataTableSkeleton } from "@/components/ui/data-table-skeleton";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { toast } from "sonner";
 
 export default function BookingsPage() {
-  const handleDelete = (id: string) => {
-    if (!confirm("Are you sure?")) return;
+  const bookings = useQuery(api.bookings.getBookings);
+  console.log(bookings);
 
-    // await deleteService({ id });
+  const deleteBooking = useMutation(api.bookings.deleteBooking);
+  const updateBookingStatus = useMutation(api.bookings.updateBookingStatus);
+
+  const handleStatusUpdate = async (
+    bookingId: string,
+    newStatus: "pending" | "confirmed" | "cancelled",
+  ) => {
+    try {
+      await updateBookingStatus({
+        bookingId: bookingId as Id<"bookings">,
+        status: newStatus,
+      });
+
+      console.log(`Updating booking ${bookingId} status to: ${newStatus}`);
+      toast.success(`Booking status updated to ${newStatus}`);
+    } catch (error) {
+      console.error("Failed to update booking status:", error);
+      toast.error("Failed to update booking status");
+    }
   };
-  const data = getBookings();
-  const columns = getColumns(handleDelete);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this booking?")) return;
+    try {
+      await deleteBooking({ bookingId: id as Id<"bookings"> });
+      toast.success("Booking deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete booking:", error);
+      toast.error("Failed to delete booking");
+    }
+  };
+
+  const columns = getColumns(handleDelete, handleStatusUpdate);
+
   return (
     <div className="">
-      <div className="mb-8 px-4 py-2 rounded-md max-w-6xl mx-auto flex items-center justify-between">
-        <h1 className="font-semibold">All Bookings</h1>
+      <div className="mb-8 px-4 py-2 rounded-md max-w-4xl mx-auto flex items-center justify-between">
+        <h1 className="text-lg font-semibold">All Bookings</h1>
         <Sheet>
           <SheetTrigger asChild>
             <Button className="ml">
@@ -106,7 +79,13 @@ export default function BookingsPage() {
           <AddBookings />
         </Sheet>
       </div>
-      <DataTable columns={columns} data={data} />
+
+      {/* 👇 Show skeleton while data is loading, then the real table */}
+      {bookings === undefined ? (
+        <DataTableSkeleton columns={9} rows={6} />
+      ) : (
+        <DataTable columns={columns} data={bookings} />
+      )}
     </div>
   );
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,84 +10,52 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
+import ViewBooking from "../BookingsComponents/ViewBooking";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export const bookings = [
-  {
-    _id: "b1",
-    name: "John Mwakyusa",
-    email: "john.mwakyusa@gmail.com",
-    phone: "+255712345678",
-    service: "Corporate and Commercial Law",
-    preferredDate: "2026-03-05",
-    message: "Seeking legal advice on company registration.",
-    status: "pending",
-    createdAt: "2026-02-20",
-  },
-  {
-    _id: "b2",
-    name: "Asha Mohamed",
-    email: "asha.mohamed@yahoo.com",
-    phone: "+255754987321",
-    service: "Labour Law",
-    preferredDate: "2026-03-07",
-    message: "Need assistance with an employment dispute.",
-    status: "confirmed",
-    createdAt: "2026-02-21",
-  },
-  {
-    _id: "b3",
-    name: "Peter Kimaro",
-    email: "peter.kimaro@gmail.com",
-    phone: "+255718223344",
-    service: "Real Estate and Conveyancing",
-    preferredDate: "2026-03-10",
-    message: "Legal support for land transfer process.",
-    status: "pending",
-    createdAt: "2026-02-22",
-  },
-  {
-    _id: "b4",
-    name: "Neema Joseph",
-    email: "neema.joseph@outlook.com",
-    phone: "+255762998877",
-    service: "Intellectual Property and Trademarks",
-    preferredDate: "2026-03-12",
-    message: "Trademark registration for my business.",
-    status: "cancelled",
-    createdAt: "2026-02-22",
-  },
-  {
-    _id: "b5",
-    name: "David Mushi",
-    email: "david.mushi@gmail.com",
-    phone: "+255713445566",
-    service: "Litigation and Arbitration",
-    preferredDate: "2026-03-15",
-    message: "Representation in a commercial dispute.",
-    status: "confirmed",
-    createdAt: "2026-02-23",
-  },
-  {
-    _id: "b6",
-    name: "Fatma Hassan",
-    email: "fatma.hassan@gmail.com",
-    phone: "+255755667788",
-    service: "Insurance Law",
-    preferredDate: "2026-03-18",
-    message: "Advice regarding an insurance claim.",
-    status: "pending",
-    createdAt: "2026-02-24",
-  },
-];
+function BookingCardSkeleton() {
+  return (
+    <div className="rounded-xl border bg-card p-4 flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-5 w-16 rounded-full" />
+      </div>
+      <Skeleton className="h-3 w-32" />
+      <Skeleton className="h-3 w-full" />
+      <Skeleton className="h-3 w-3/4" />
+      <div className="flex items-center justify-between mt-1">
+        <Skeleton className="h-3 w-28" />
+        <Skeleton className="h-8 w-16 rounded-md" />
+      </div>
+    </div>
+  );
+}
 
 export default function LatestBookings() {
+  const latestBookings = useQuery(api.dashboard.getLatestBookings);
+
+  // Show skeletons while data is loading
+  if (!latestBookings) {
+    return (
+      <div className="flex flex-col gap-4">
+        <Skeleton className="h-5 w-36" />
+        {[1, 2, 3].map((i) => (
+          <BookingCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-lg font-medium">Latest Bookings</h1>
-      {bookings.slice(0, 5).map((booking) => (
+      {latestBookings?.map((booking) => (
         <Card key={booking._id} className="flex flex-col gap-2">
           <CardHeader>
-            <CardTitle>{booking.service}</CardTitle>
+            <CardTitle>{booking.serviceBooked}</CardTitle>
             <div className="flex gap-4 items-center justify-between">
               <CardDescription>{booking.name}</CardDescription>
               <Badge
@@ -109,9 +79,29 @@ export default function LatestBookings() {
           </CardContent>
           <CardFooter className="flex justify-between">
             <p className="text-xs leading-relaxed text-gray-500">
-              Booked on {booking.createdAt}
+              Booked on{" "}
+              <span className="font-semibold text-primary bg-primary/10 px-2 py-1 rounded-md">
+                {new Date(booking.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>{" "}
+              at{" "}
+              <span className="font-semibold text-primary bg-primary/10 px-2 py-1 rounded-md">
+                {new Date(booking.createdAt).toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
             </p>
-            <Button>View</Button>
+
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button>View</Button>
+              </SheetTrigger>
+              <ViewBooking booking={booking} />
+            </Sheet>
           </CardFooter>
         </Card>
       ))}

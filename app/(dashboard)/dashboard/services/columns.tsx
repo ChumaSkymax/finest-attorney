@@ -8,12 +8,23 @@ import z from "zod";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import EditService from "@/components/Dashboard/ServicesComponents/EditService";
 
+interface IService {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+  image: string | null;
+  createdBy: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
 export const getColumns = (
   handleDelete: (id: string) => void,
-): ColumnDef<z.infer<typeof serviceSchema>>[] => [
+): ColumnDef<IService>[] => [
   {
     accessorKey: "image",
     header: "Image",
@@ -49,7 +60,7 @@ export const getColumns = (
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
-      const getPreviewText = (text: string, maxChars = 80) => {
+      const getPreviewText = (text: string, maxChars = 50) => {
         if (!text) return "No description";
         if (text.length <= maxChars) return text;
         return text.slice(0, maxChars) + "...";
@@ -81,15 +92,13 @@ export const getColumns = (
                 </Button>
               </SheetTrigger>
 
-              <SheetContent>
-                <EditService service={service} />
-              </SheetContent>
+              <EditService service={service} />
             </Sheet>
 
             {/* Delete Button */}
             <Button
               size="sm"
-              variant="destructive"
+              variant="outline"
               onClick={() => handleDelete(service._id)}
             >
               <Trash className="h-4 w-4" />

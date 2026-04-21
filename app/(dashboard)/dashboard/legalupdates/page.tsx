@@ -7,19 +7,32 @@ import { DataTable } from "./data-table";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { getColumns } from "./columns";
 import AddArticles from "@/components/Dashboard/LegalUpdatesComponents/AddArticles";
-import getArticlesData from "@/data/LegalUpdatesData";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
+import { Id } from "@/convex/_generated/dataModel";
+import { DataTableSkeleton } from "@/components/ui/data-table-skeleton";
 
 export default function () {
-  const handleDelete = (id: string) => {
-    if (!confirm("Are you sure?")) return;
+  const articles = useQuery(api.legalupdates.getLegalUpdate);
+  const deleteArticle = useMutation(api.legalupdates.deleteArticle);
 
-    // await deleteService({ id });
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this article?")) return;
+
+    try {
+      await deleteArticle({ id: id as Id<"legalupdates"> });
+      toast.success("Article deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete article", error);
+      toast.error("Failed to delete article");
+    }
   };
-  const data = getArticlesData();
+
   const columns = getColumns(handleDelete);
   return (
     <div className="relative">
-      <div className="mb-8 px-4 py-2 rounded-md max-w-6xl mx-auto flex items-center justify-between">
+      <div className="mb-8 px-4 py-2 rounded-md max-w-4xl mx-auto flex items-center justify-between">
         <h1 className="font-semibold">All Articles</h1>
         <Sheet>
           <SheetTrigger asChild>
@@ -29,7 +42,11 @@ export default function () {
         </Sheet>
       </div>
 
-      <DataTable columns={columns} data={data} />
+      {articles === undefined ? (
+        <DataTableSkeleton columns={6} rows={13} />
+      ) : (
+        <DataTable columns={columns} data={articles} />
+      )}
     </div>
   );
 }
