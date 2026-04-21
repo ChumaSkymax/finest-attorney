@@ -3,13 +3,8 @@ import { ArrowRight, Target } from "lucide-react";
 import Link from "next/link";
 import AnimatedContent from "@/components/web/AnimatedContent";
 import { CoreValues } from "@/data/data";
-import Title from "@/components/web/Title";
-import getTeamData from "@/data/teamData";
-import { Separator } from "@/components/ui/separator";
-import Team from "@/components/web/team";
 
 export default function () {
-  const data = getTeamData();
   return (
     <div className="relative mt-8">
       <div className="max-w-6xl mx-auto px-4 ">
