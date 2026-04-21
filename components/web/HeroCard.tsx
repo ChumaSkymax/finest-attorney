@@ -228,7 +228,7 @@ const HeroCard = () => {
                   tabIndex={-1}
                 >
                   <div className="">
-                    <h2 className="text-2xl font-semibold text-white dark:text-gray-100 break-words ">
+                    <h2 className="text-2xl font-playfair-display font-semibold text-white dark:text-gray-100 break-words mb-2 ">
                       {card.title}
                     </h2>
                     <p className="text-sm text-white dark:text-gray-100 whitespace-pre-line break-words mt-1">

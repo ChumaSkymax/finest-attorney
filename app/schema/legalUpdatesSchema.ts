@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const legalUpdatesSchema = z.object({
+  _id: z.string().optional(),
   title: z.string().min(3, "Title must be at least 3 characters long"),
   slug: z.string().min(3, "Slug must be at least 3 characters long"),
   description: z
